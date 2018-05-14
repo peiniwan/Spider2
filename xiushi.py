@@ -3,9 +3,14 @@
 import re
 import urllib2
 
+from BeautifulSoup import BeautifulSoup
+
+import soup
+
 
 # page = 1
 # url = 'http://www.qiushibaike.com/hot/page/' + str(page)
+# # 反链
 # user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 # headers = {'User-Agent': user_agent}
 # try:
@@ -15,22 +20,12 @@ import urllib2
 #     # with open('xiushi.html', 'wb') as f:
 #     #     f.write(response.read())
 #     # print response.read()
-#
-#     content = response.read().decode('utf-8')
-#     pattern = re.compile('<div.*?author clearfix">.*?<a.*?<img.*?>(.*?)</a>.*?<div.*?' +
-#                          'content">(.*?)<!--(.*?)-->.*?</div>(.*?)<div class="stats.*?class="number">(.*?)</i>', re.S)
-#     items = re.findall(pattern, content)
-#     for item in items:
-#         #     haveImg = re.search("img", item[3])
-#         # if not haveImg:
-#         print item[1]
-#
+
 # except urllib2.URLError, e:
 #     if hasattr(e, "code"):
 #         print e.code
 #     if hasattr(e, "reason"):
 #         print e.reason
-
 
 # 糗事百科爬虫类
 class QSBK:
@@ -38,6 +33,7 @@ class QSBK:
     # 初始化方法，定义一些变量
     def __init__(self):
         self.pageIndex = 1
+        # 反链
         self.user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
         # 初始化 headers
         self.headers = {'User-Agent': self.user_agent}
@@ -69,22 +65,30 @@ class QSBK:
         if not pageCode:
             print "页面加载失败...."
             return None
-        pattern = re.compile('<div.*?author clearfix">.*?<a.*?<img.*?>(.*?)</a>.*?<div.*?' +
-                             'content">(.*?)<!--(.*?)-->.*?</div>(.*?)<div class="stats.*?class="number">(.*?)</i>',
-                             re.S)
+        pattern = re.compile(
+            '<div class="author clearfix">.*?<a.*?<h2>(.*?)</h2>.*?<div class="articleGender manIcon">(.*?)</div>.*?<div class="content">.*?<span>(.*?)</span>.*?<span class="stats-vote"><i class="number">(.*?)</i>',
+            re.S)
         items = re.findall(pattern, pageCode)
+
+        # author = re.findall(r'<div class="author clearfix">.*?<h2>(.*?)</h2>', pageCode, re.S)
+        # # lv = re.findall(r'<div class="articleGender manIcon">(.*?)</div>', pageCode, re.S)
+        # content = re.findall(r'<div class="content">.*?<span>(.*?)</span>', pageCode, re.S)
+        # zan = re.findall(r'<span class="stats-vote"><i class="number">(.*?)</i>', pageCode, re.S)
+
         # 用来存储每页的段子们
         pageStories = []
+        # pageStories = [author, content, 0, zan]
         # 遍历正则表达式匹配的信息
         for item in items:
+            # print item
             # 是否含有图片
-            haveImg = re.search("img", item[3])
-            # 如果不含有图片，把它加入 list 中
-            if not haveImg:
-                replaceBR = re.compile('<br/>')
-                text = re.sub(replaceBR, "\n", item[1])
-                # item[0] 是一个段子的发布者，item[1] 是内容，item[2] 是发布时间, item[4] 是点赞数
-                pageStories.append([item[0].strip(), text.strip(), item[2].strip(), item[4].strip()])
+            # haveImg = re.search("img", item[3])
+            # # 如果不含有图片，把它加入 list 中
+            # if not haveImg:
+            replaceBR = re.compile('<br/>')
+            text = re.sub(replaceBR, "\n", item[2])
+            # item[0] 是一个段子的发布者，item[2] 是内容，item[1] 是等级, item[] 是点赞数
+            pageStories.append([item[0].strip(), text.strip(), item[1].strip(), item[3].strip()])
         return pageStories
 
     # 加载并提取页面的内容，加入到列表中
@@ -112,7 +116,8 @@ class QSBK:
             if input == "Q":
                 self.enable = False
                 return
-            print u"第 %d 页 \ t 发布人:%s\t 发布时间:%s\t 赞:%s\n%s" % (page, story[0], story[2], story[3], story[1])
+            # print u"第 %d 页 \ t 发布人:%s\t 发布时间:%s\t 赞:%s\n%s" % (page, story[0], story[2], story[3], story[1])
+            print u"第 %d 页  发布人:%s 赞:%s\n%s" % (page, story[0], story[3], story[1])
 
     # 开始方法
     def start(self):
