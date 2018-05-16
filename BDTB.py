@@ -4,7 +4,7 @@ import re
 import urllib2
 
 
-# 处理页面标签类
+# 去掉页面的标签，内容中有标签
 class Tool:
     # 去除 img 标签, 7 位长空格
     removeImg = re.compile('<img.*?>| {7}|')
