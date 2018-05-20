@@ -1,64 +1,70 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/env python
 import random
+import re
 
+import pymysql
 import requests
 from bs4 import BeautifulSoup
 import os
 
 
-# requests加BeautifulSoup爬虫
-# 其他是urlib加正则
-# 抓取妹子图
 class mzitu():
 
     def all_url(self, url):
         html = self.request(url)
         all_a = BeautifulSoup(html.text, 'lxml').find('div', class_='all').find_all('a')
-        for a in all_a:
+        for index, a in enumerate(all_a):
             title = a.get_text()
-            print(u'开始保存：', title)
-            path = title.replace("?", '_')
-            if not self.mkdir(path):  ##跳过已存在的文件夹
-                print(u'已经跳过：', title)
+            if (cmp(title, u'早期图片') == 0):
                 continue
             href = a['href']
-            self.html(href)
+            lists = self.html(href, title)
+            for i in lists:
+                # print(i['meiziid'], i['title'], i['picname'], i['page_url'], i['img_url'])
+                # 插入数据到数据库sql语句，%s用作字符串占位
+                sql = "INSERT INTO `meizi_meizis`(`mid`,`title`,`picname`,`page_url`,`img_url`) VALUES(%s,%s,%s,%s,%s)"
+                try:
+                    cursor.execute(sql, (i['meiziid'], i['title'], i['picname'], i['page_url'], i['img_url']))
+                    db.commit()
+                    print(i[0] + " is success")
+                except:
+                    db.rollback()
+        db.close()  # 关闭数据库
 
-    def html(self, href):
+    def html(self, href, title):
+        lists = []
+        meiziid = href.split('/')[-1]
         html = self.request(href)
         max_span = BeautifulSoup(html.text, 'lxml').find('div', class_='pagenavi').find_all('span')[-2].get_text()
         for page in range(1, int(max_span) + 1):
+            meizi = {}
             page_url = href + '/' + str(page)
-            self.img(page_url)
+            img_html = self.request(page_url)
+            img_url = BeautifulSoup(img_html.text, 'lxml').find('div', class_='main-image').find('img')['src']
+            picname = img_url[-9:-4]
+            # img = self.requestpic(img_url, page_url)
+            meizi['meiziid'] = meiziid
+            meizi['title'] = title
+            meizi['picname'] = picname
+            meizi['page_url'] = page_url
+            meizi['img_url'] = img_url
+            lists.append(meizi)  # 保存到返回数组中
+        return lists
 
-    def img(self, page_url):
-        img_html = self.request(page_url)
-        img_url = BeautifulSoup(img_html.text, 'lxml').find('div', class_='main-image').find('img')['src']
-        self.save(img_url, page_url)
-
-    def save(self, img_url, page_url):
-        name = img_url[-9:-4]
-        try:
-            img = self.requestpic(img_url, page_url)
-            f = open(name + '.jpg', 'ab')  # 写入多媒体文件必须要 b 这个参数！！必须要！！
-            f.write(img.content)
-            f.close()
-        except:  ##捕获异常，继续往下走
-            print(u'图片不存在已跳过：', img_url)
-            return False
-
-    def mkdir(self, path):  ##这个函数创建文件夹，可以在别的项目里用
-        path = path.strip()
-        isExists = os.path.exists(os.path.join("E:\mzitu", path))
-        if not isExists:
-            print(u'建了一个名字叫做', path, u'的文件夹！')
-            os.makedirs(os.path.join("E:\mzitu", path))
-            os.chdir(os.path.join("E:\mzitu", path))  ##切换到目录
-            return True
-        else:
-            print(u'名字叫做', path, u'的文件夹已经存在了！')
-            return False
+    def createAndSave(self):
+        cursor.execute("DROP TABLE IF EXISTS meizi_meizis")  # 如果表存在则删除
+        # 创建表sql语句
+        createTab = """create table meizi_meizis(
+                id int primary key auto_increment,
+                mid varchar(10) not null,
+                title varchar(50),
+                picname varchar(10),
+                page_url varchar(50),
+                img_url varchar(50)
+                );"""
+        cursor.execute(createTab)  # 执行创建数据表操作
+        Mzitu.all_url('http://www.mzitu.com/all')
 
     def requestpic(self, url, Referer):  ##这个函数获取网页的response 然后返回
         user_agent_list = [ \
@@ -94,5 +100,9 @@ class mzitu():
 
 
 Mzitu = mzitu()  ##实例化
-Mzitu.all_url('http://www.mzitu.com/all')
+# 连接数据库，需指定charset否则可能会报错
+db = pymysql.connect(host="localhost", user="root", password="123", db="mysql", charset="utf8mb4")
+cursor = db.cursor()  # 创建一个游标对象
+Mzitu.createAndSave()
+
 print(u'恭喜您下载完成啦！')
