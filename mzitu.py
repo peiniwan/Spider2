@@ -17,6 +17,8 @@ class mzitu():
         all_a = BeautifulSoup(html.text, 'lxml').find('div', class_='all').find_all('a')
         for a in all_a:
             title = a.get_text()
+            if (cmp(title, u'早期图片') == 0):
+                continue
             print(u'开始保存：', title)
             path = title.replace("?", '_')
             if not self.mkdir(path):  ##跳过已存在的文件夹
@@ -50,11 +52,11 @@ class mzitu():
 
     def mkdir(self, path):  ##这个函数创建文件夹，可以在别的项目里用
         path = path.strip()
-        isExists = os.path.exists(os.path.join("E:\mzitu", path))
+        isExists = os.path.exists(os.path.join("d:\mzitu", path))
         if not isExists:
             print(u'建了一个名字叫做', path, u'的文件夹！')
-            os.makedirs(os.path.join("E:\mzitu", path))
-            os.chdir(os.path.join("E:\mzitu", path))  ##切换到目录
+            os.makedirs(os.path.join("d:\mzitu", path))
+            os.chdir(os.path.join("d:\mzitu", path))  ##切换到目录
             return True
         else:
             print(u'名字叫做', path, u'的文件夹已经存在了！')

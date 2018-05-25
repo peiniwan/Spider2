@@ -24,12 +24,13 @@ class mzitu():
                 # print(i['meiziid'], i['title'], i['picname'], i['page_url'], i['img_url'])
                 # 插入数据到数据库sql语句，%s用作字符串占位
                 sql = "INSERT INTO `meizi_meizis`(`mid`,`title`,`picname`,`page_url`,`img_url`) VALUES(%s,%s,%s,%s,%s)"
-                try:
-                    cursor.execute(sql, (i['meiziid'], i['title'], i['picname'], i['page_url'], i['img_url']))
-                    db.commit()
-                    print(i[0] + " is success")
-                except:
-                    db.rollback()
+                # try:
+                cursor.execute(sql, (i['meiziid'], i['title'], i['picname'], i['page_url'], i['img_url']))
+                db.commit()
+                print(i['meiziid'] + " is success")
+                # except:
+                #     print(i['meiziid'] + " is fail")
+                #     db.rollback()
         db.close()  # 关闭数据库
 
     def html(self, href, title):
@@ -62,7 +63,7 @@ class mzitu():
                 picname varchar(10),
                 page_url varchar(50),
                 img_url varchar(50)
-                );"""
+                ) default charset=utf8;"""
         cursor.execute(createTab)  # 执行创建数据表操作
         Mzitu.all_url('http://www.mzitu.com/all')
 
