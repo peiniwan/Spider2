@@ -8,6 +8,7 @@ import urllib2
 # 得这样导入
 from bs4 import BeautifulSoup
 
+# 抓取淘女郎
 # 如果网页找不到，就是ajax异步加载，去xhr里去找
 # 右键看源码
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'

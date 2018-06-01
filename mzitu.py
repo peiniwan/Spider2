@@ -6,10 +6,9 @@ import requests
 from bs4 import BeautifulSoup
 import os
 
-
+# 抓取妹子图
 # requests加BeautifulSoup爬虫
 # 其他是urlib加正则
-# 抓取妹子图
 class mzitu():
 
     def all_url(self, url):

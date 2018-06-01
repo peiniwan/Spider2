@@ -4,6 +4,7 @@ import re
 import urllib2
 
 
+# 爬取百度贴吧
 # 去掉页面的标签，内容中有标签
 class Tool:
     # 去除 img 标签, 7 位长空格

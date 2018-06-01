@@ -3,17 +3,8 @@
 import re
 import urllib2
 
-from BeautifulSoup import BeautifulSoup
 
-import soup
-
-
-# page = 1
-# url = 'http://www.qiushibaike.com/hot/page/' + str(page)
-# # 反链
-# user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-# headers = {'User-Agent': user_agent}
-# try:
+# 糗事百科爬虫类
 #     request = urllib2.Request(url, headers=headers)
 #     response = urllib2.urlopen(request)
 #     # 把接收的数据写入文件:
@@ -21,13 +12,6 @@ import soup
 #     #     f.write(response.read())
 #     # print response.read()
 
-# except urllib2.URLError, e:
-#     if hasattr(e, "code"):
-#         print e.code
-#     if hasattr(e, "reason"):
-#         print e.reason
-
-# 糗事百科爬虫类
 class QSBK:
 
     # 初始化方法，定义一些变量

@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import os
 
 
+# 抓妹子图，并保存到数据库
 class mzitu():
 
     def all_url(self, url):
