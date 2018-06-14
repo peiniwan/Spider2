@@ -19,7 +19,6 @@
   * 查看好友男女比例
   * 查看好友中国地图上的分布
   * 好友签名词云
-  
   ![](https://ws1.sinaimg.cn/large/006ISEZBly1fsap6n0zj0j30gw0l643g.jpg)
 
 
